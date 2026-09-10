@@ -1,1 +1,98 @@
+name: Android Geofence POC v3.1
 
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - poc/native-geofence
+
+jobs:
+  build-android-poc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      VITE_BASE44_APP_ID: 6a3f3ae0473f4e5dce013c32
+      VITE_BASE44_APP_BASE_URL: https://app.borisend.macpeniel.com
+      BORISEND_POC_KEYSTORE: ${{ github.workspace }}/borisend-geofence-poc.keystore
+      BORISEND_POC_KEY_ALIAS: borisend-geofence-poc
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build BoriSend web bundle against existing Base44 backend
+        run: npm run build
+
+      - name: Generate isolated Capacitor Android project
+        run: npx cap add android
+
+      - name: Install BoriSend native geofence POC
+        run: node scripts/prepare-android-geofence-poc.mjs
+
+      - name: Create ephemeral POC signing credentials and key
+        shell: bash
+        run: |
+          STORE_PASSWORD="$(openssl rand -hex 24)"
+          KEY_PASSWORD="$STORE_PASSWORD"
+          echo "::add-mask::$STORE_PASSWORD"
+          echo "::add-mask::$KEY_PASSWORD"
+          echo "BORISEND_POC_STORE_PASSWORD=$STORE_PASSWORD" >> "$GITHUB_ENV"
+          echo "BORISEND_POC_KEY_PASSWORD=$KEY_PASSWORD" >> "$GITHUB_ENV"
+          keytool -genkeypair -v \
+            -keystore "$BORISEND_POC_KEYSTORE" \
+            -storepass "$STORE_PASSWORD" \
+            -alias "$BORISEND_POC_KEY_ALIAS" \
+            -keypass "$KEY_PASSWORD" \
+            -keyalg RSA -keysize 2048 -validity 3650 \
+            -dname "CN=BoriSend Geofence POC, OU=POC, O=Macpeniel Limited, L=Nottingham, C=GB"
+
+      - name: Configure signed release build
+        run: node scripts/configure-android-release-signing.mjs
+
+      - name: Verify isolated package and geofence wiring
+        run: |
+          grep -R "com.base6a3f3ae0473f4e5dce013c32.app.geofencepoc" capacitor.config.ts
+          grep -R "GeofencePlugin" android/app/src/main/java
+          grep -R "GeofenceBroadcastReceiver" android/app/src/main/AndroidManifest.xml
+          grep -R "ACCESS_BACKGROUND_LOCATION" android/app/src/main/AndroidManifest.xml
+
+      - name: Build signed release APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --stacktrace
+
+      - name: Verify APK install metadata and signature
+        run: |
+          APK="android/app/build/outputs/apk/release/app-release.apk"
+          echo "APK=$APK"
+          ls -lh "$APK"
+          "$ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)/aapt" dump badging "$APK" | head -25
+          "$ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)/apksigner" verify --verbose --print-certs "$APK"
+
+      - name: Upload signed POC APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: BoriSend-Geofence-POC-v3.1-signed-release
+          path: android/app/build/outputs/apk/release/app-release.apk
+          if-no-files-found: error
+          retention-days: 7
