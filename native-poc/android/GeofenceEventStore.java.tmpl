@@ -1,0 +1,64 @@
+package __PACKAGE__;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.UUID;
+
+final class GeofenceEventStore {
+    static final String PREFS = "borisend_geofence_poc";
+    static final String EVENTS_KEY = "pending_events";
+    static final int MAX_EVENTS = 100;
+
+    private GeofenceEventStore() {}
+
+    static synchronized JSONObject append(Context context, String geofenceId, String transition) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        JSONArray events = readArray(prefs.getString(EVENTS_KEY, "[]"));
+        JSONArray trimmed = new JSONArray();
+        int start = Math.max(0, events.length() - (MAX_EVENTS - 1));
+        for (int i = start; i < events.length(); i++) {
+            try { trimmed.put(events.getJSONObject(i)); } catch (JSONException ignored) {}
+        }
+
+        JSONObject event = new JSONObject();
+        try {
+            event.put("event_id", UUID.randomUUID().toString());
+            event.put("geofence_id", geofenceId);
+            event.put("id", geofenceId);
+            event.put("transition", transition);
+            event.put("occurred_at", new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", java.util.Locale.US).format(new java.util.Date()));
+            trimmed.put(event);
+            prefs.edit().putString(EVENTS_KEY, trimmed.toString()).apply();
+        } catch (JSONException ignored) {}
+        return event;
+    }
+
+    static synchronized JSONArray list(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        return readArray(prefs.getString(EVENTS_KEY, "[]"));
+    }
+
+    static synchronized void ack(Context context, String eventId) {
+        if (eventId == null || eventId.isEmpty()) return;
+        SharedPreferences prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        JSONArray events = readArray(prefs.getString(EVENTS_KEY, "[]"));
+        JSONArray kept = new JSONArray();
+        for (int i = 0; i < events.length(); i++) {
+            try {
+                JSONObject event = events.getJSONObject(i);
+                if (!eventId.equals(event.optString("event_id"))) kept.put(event);
+            } catch (JSONException ignored) {}
+        }
+        prefs.edit().putString(EVENTS_KEY, kept.toString()).apply();
+    }
+
+    private static JSONArray readArray(String raw) {
+        try { return new JSONArray(raw == null ? "[]" : raw); }
+        catch (JSONException e) { return new JSONArray(); }
+    }
+}

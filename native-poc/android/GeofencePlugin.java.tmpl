@@ -1,0 +1,246 @@
+package __PACKAGE__;
+
+import android.Manifest;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.Settings;
+
+import androidx.activity.result.ActivityResult;
+import androidx.core.content.ContextCompat;
+
+import com.getcapacitor.JSArray;
+import com.getcapacitor.JSObject;
+import com.getcapacitor.PermissionState;
+import com.getcapacitor.Plugin;
+import com.getcapacitor.PluginCall;
+import com.getcapacitor.PluginMethod;
+import com.getcapacitor.annotation.CapacitorPlugin;
+import com.getcapacitor.annotation.Permission;
+import com.getcapacitor.annotation.PermissionCallback;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationServices;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Collections;
+
+@CapacitorPlugin(
+    name = "Geofence",
+    permissions = {
+        @Permission(strings = { Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION }, alias = "location"),
+        @Permission(strings = { Manifest.permission.ACCESS_BACKGROUND_LOCATION }, alias = "backgroundLocation")
+    }
+)
+public class GeofencePlugin extends Plugin {
+    private GeofencingClient client;
+    private BroadcastReceiver liveReceiver;
+
+    @Override
+    public void load() {
+        client = LocationServices.getGeofencingClient(getContext());
+        liveReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String raw = intent.getStringExtra("event_json");
+                if (raw == null) return;
+                try {
+                    notifyListeners("geofenceTransition", JSObject.fromJSONObject(new JSONObject(raw)), true);
+                } catch (JSONException ignored) {}
+            }
+        };
+        ContextCompat.registerReceiver(
+            getContext(),
+            liveReceiver,
+            new IntentFilter(GeofenceBroadcastReceiver.ACTION_TRANSITION),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        );
+    }
+
+    @Override
+    protected void handleOnDestroy() {
+        if (liveReceiver != null) {
+            try { getContext().unregisterReceiver(liveReceiver); } catch (Exception ignored) {}
+        }
+        super.handleOnDestroy();
+    }
+
+    @PluginMethod
+    public void checkPermission(PluginCall call) {
+        JSObject ret = new JSObject();
+        ret.put("status", permissionStatus());
+        call.resolve(ret);
+    }
+
+    @PluginMethod
+    public void requestPermission(PluginCall call) {
+        if (hasForegroundLocation()) {
+            requestBackgroundIfNeeded(call);
+            return;
+        }
+        requestPermissionForAlias("location", call, "foregroundPermissionCallback");
+    }
+
+    @PermissionCallback
+    private void foregroundPermissionCallback(PluginCall call) {
+        if (!hasForegroundLocation()) {
+            JSObject ret = new JSObject();
+            ret.put("status", "denied");
+            call.resolve(ret);
+            return;
+        }
+        requestBackgroundIfNeeded(call);
+    }
+
+    private void requestBackgroundIfNeeded(PluginCall call) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q || hasBackgroundLocation()) {
+            JSObject ret = new JSObject();
+            ret.put("status", "granted");
+            call.resolve(ret);
+            return;
+        }
+        requestPermissionForAlias("backgroundLocation", call, "backgroundPermissionCallback");
+    }
+
+    @PermissionCallback
+    private void backgroundPermissionCallback(PluginCall call) {
+        JSObject ret = new JSObject();
+        ret.put("status", hasBackgroundLocation() ? "granted" : "denied");
+        call.resolve(ret);
+    }
+
+    @PluginMethod
+    public void openSettings(PluginCall call) {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(Uri.fromParts("package", getContext().getPackageName(), null));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        getContext().startActivity(intent);
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void addGeofence(PluginCall call) {
+        if (!"granted".equals(permissionStatus())) {
+            call.reject("Background location permission is required for native geofencing");
+            return;
+        }
+
+        String id = call.getString("id");
+        Double latitude = call.getDouble("latitude");
+        Double longitude = call.getDouble("longitude");
+        Double radius = call.getDouble("radius");
+        String transitionType = call.getString("transitionType", "enter");
+        Boolean notifyOnEntry = call.getBoolean("notifyOnEntry", "enter".equals(transitionType));
+        Boolean notifyOnExit = call.getBoolean("notifyOnExit", "exit".equals(transitionType));
+
+        if (id == null || id.isEmpty() || latitude == null || longitude == null || radius == null) {
+            call.reject("id, latitude, longitude and radius are required");
+            return;
+        }
+
+        int transitions = 0;
+        if (Boolean.TRUE.equals(notifyOnEntry)) transitions |= Geofence.GEOFENCE_TRANSITION_ENTER;
+        if (Boolean.TRUE.equals(notifyOnExit)) transitions |= Geofence.GEOFENCE_TRANSITION_EXIT;
+        if (transitions == 0) {
+            call.reject("At least one transition must be enabled");
+            return;
+        }
+
+        Geofence geofence = new Geofence.Builder()
+            .setRequestId(id)
+            .setCircularRegion(latitude, longitude, radius.floatValue())
+            .setExpirationDuration(Geofence.NEVER_EXPIRE)
+            .setTransitionTypes(transitions)
+            .setNotificationResponsiveness(30000)
+            .build();
+
+        GeofencingRequest request = new GeofencingRequest.Builder()
+            .setInitialTrigger(0)
+            .addGeofence(geofence)
+            .build();
+
+        try {
+            client.addGeofences(request, geofencePendingIntent())
+                .addOnSuccessListener(unused -> call.resolve())
+                .addOnFailureListener(error -> call.reject("Geofence registration failed: " + error.getMessage()));
+        } catch (SecurityException e) {
+            call.reject("Location permission missing", e);
+        }
+    }
+
+    @PluginMethod
+    public void removeGeofence(PluginCall call) {
+        String id = call.getString("id");
+        if (id == null || id.isEmpty()) {
+            call.reject("id is required");
+            return;
+        }
+        client.removeGeofences(Collections.singletonList(id))
+            .addOnSuccessListener(unused -> call.resolve())
+            .addOnFailureListener(error -> call.reject("Geofence removal failed: " + error.getMessage()));
+    }
+
+    @PluginMethod
+    public void removeAllGeofences(PluginCall call) {
+        client.removeGeofences(geofencePendingIntent())
+            .addOnSuccessListener(unused -> call.resolve())
+            .addOnFailureListener(error -> call.reject("Geofence cleanup failed: " + error.getMessage()));
+    }
+
+    @PluginMethod
+    public void getPendingTransitions(PluginCall call) {
+        JSONArray pending = GeofenceEventStore.list(getContext());
+        JSObject ret = new JSObject();
+        try {
+            ret.put("events", new JSArray(pending.toString()));
+        } catch (JSONException e) {
+            ret.put("events", new JSArray());
+        }
+        call.resolve(ret);
+    }
+
+    @PluginMethod
+    public void ackPendingTransition(PluginCall call) {
+        String eventId = call.getString("event_id");
+        if (eventId == null || eventId.isEmpty()) {
+            call.reject("event_id is required");
+            return;
+        }
+        GeofenceEventStore.ack(getContext(), eventId);
+        call.resolve();
+    }
+
+    private PendingIntent geofencePendingIntent() {
+        Intent intent = new Intent(getContext(), GeofenceBroadcastReceiver.class);
+        return PendingIntent.getBroadcast(
+            getContext(),
+            7331,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE
+        );
+    }
+
+    private boolean hasForegroundLocation() {
+        return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private boolean hasBackgroundLocation() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return true;
+        return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private String permissionStatus() {
+        if (!hasForegroundLocation()) return "prompt";
+        if (!hasBackgroundLocation()) return "prompt";
+        return "granted";
+    }
+}
