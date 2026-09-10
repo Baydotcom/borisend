@@ -1,0 +1,149 @@
+{
+  "name": "MembershipSubscription",
+  "type": "object",
+  "properties": {
+    "owner_user_id": {
+      "type": "string",
+      "description": "Authoritative owner user ID \u2014 set server-side from the authenticated user, never trusted from the client."
+    },
+    "membership_config_id": {
+      "type": "string",
+      "description": "MembershipConfiguration entity ID defining the membership product and included capacity. References the specific commercial version the subscriber purchased under."
+    },
+    "stripe_price_id": {
+      "type": "string",
+      "description": "RC16.5: The Stripe Price ID under which this subscription was created. Preserved as the historical price reference \u2014 if admin changes the MembershipConfiguration's Stripe Price ID for new sales, existing subscribers retain their original price. Empty for internal/admin-granted memberships without a Stripe subscription."
+    },
+    "payment_provider": {
+      "type": "string",
+      "enum": [
+        "stripe",
+        "apple"
+      ],
+      "default": "stripe",
+      "description": "RC20.3: Which payment provider backs this membership. 'stripe' (default) for web/Stripe subscribers. 'apple' for Apple In-App Purchase subscribers. EntitlementService does NOT branch on this field \u2014 it is metadata used by the UI (manage-subscription routing) and server-side reconciliation. Defaults to 'stripe' so all existing Stripe-backed records are backward-compatible."
+    },
+    "apple_original_transaction_id": {
+      "type": "string",
+      "description": "RC20.3: Apple's durable subscription-family identifier. One auto-renewable subscription generates multiple transactionIds over its lifecycle (initial purchase, renewals) but shares ONE originalTransactionId. Used as the durable lookup key for Apple-backed memberships. Null for Stripe-backed memberships."
+    },
+    "apple_transaction_id": {
+      "type": "string",
+      "description": "RC20.3: Apple's latest transaction ID for this subscription. Updated on each renewal. Not used as a permanent identifier \u2014 originalTransactionId is the durable key. Null for Stripe-backed memberships."
+    },
+    "apple_product_id": {
+      "type": "string",
+      "description": "RC20.3: The App Store Connect auto-renewable subscription product ID (e.g. the monthly or annual product). Null for Stripe-backed memberships."
+    },
+    "apple_environment": {
+      "type": "string",
+      "enum": [
+        "Sandbox",
+        "Production"
+      ],
+      "description": "RC20.3: Whether this Apple subscription was verified in Apple's Sandbox or Production environment. Null for Stripe-backed memberships."
+    },
+    "apple_auto_renew_status": {
+      "type": "string",
+      "enum": [
+        "on",
+        "off"
+      ],
+      "description": "RC20.3: Whether the subscriber's auto-renew preference is on or off (from Apple's renewalInfo). 'off' maps to cancel_at_period_end=true. Null for Stripe-backed memberships."
+    },
+    "apple_revocation_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RC20.3: When Apple revoked/refunded this subscription (from Apple's transactionInfo.revocationDate). Null if not revoked. Null for Stripe-backed memberships."
+    },
+    "apple_revocation_reason": {
+      "type": "string",
+      "description": "RC20.3: Apple's revocation reason code (from Apple's transactionInfo.revocationReason). Null if not revoked. Null for Stripe-backed memberships."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "past_due",
+        "cancelled",
+        "expired",
+        "trial",
+        "grace"
+      ],
+      "default": "active",
+      "description": "Authoritative membership lifecycle status. Stripe is the billing source of truth; this mirrors Stripe state. RC20.3: For Apple-backed memberships, this is set from verified Apple transaction state (active if expiresDate > now, expired if past, cancelled if revoked)."
+    },
+    "billing_interval": {
+      "type": "string",
+      "enum": [
+        "monthly",
+        "annual"
+      ],
+      "default": "monthly"
+    },
+    "stripe_customer_id": {
+      "type": "string"
+    },
+    "stripe_subscription_id": {
+      "type": "string"
+    },
+    "current_period_start": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "current_period_end": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "cancel_at_period_end": {
+      "type": "boolean",
+      "default": false
+    },
+    "pending_membership_config_id": {
+      "type": "string",
+      "description": "Future membership product after a scheduled (downgrade) change. BoriSend 2.0 launches with one membership; this supports future tiers."
+    },
+    "pending_change_effective_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RC16.5: When a pending membership change takes effect. Supports period-end migration (default) vs immediate migration for future price changes."
+    },
+    "trial_ends_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "owner_user_id",
+    "membership_config_id"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.owner_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

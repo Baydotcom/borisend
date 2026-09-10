@@ -1,0 +1,193 @@
+{
+  "name": "Message",
+  "type": "object",
+  "properties": {
+    "campaign_id": {
+      "type": "string",
+      "description": "Campaign/Communication Plan ID. Null for Smart Messages (use smart_message_id instead)."
+    },
+    "smart_message_id": {
+      "type": "string",
+      "description": "RC18.1: SmartMessage entity ID. Set when this message was created by a Smart Message execution. Null for Generated Messages."
+    },
+    "user_id": {
+      "type": "string",
+      "description": "Explicit owner ID \u2014 needed because asServiceRole overrides created_by_id"
+    },
+    "content": {
+      "type": "string"
+    },
+    "recipient_name": {
+      "type": "string"
+    },
+    "recipient_phone": {
+      "type": "string"
+    },
+    "plan_recipient_id": {
+      "type": "string",
+      "description": "RC15.1: Authoritative PlanRecipient entity ID for personalised messages. Null for Smart Messages and legacy messages."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "sent",
+        "skipped",
+        "failed",
+        "draft",
+        "cancelled"
+      ],
+      "default": "pending",
+      "description": "RC16.2: 'cancelled' is the terminal state for pending/approved messages belonging to an archived plan."
+    },
+    "resolution_reason": {
+      "type": "string",
+      "enum": [
+        "user_deleted",
+        "plan_archived",
+        "system_cancelled",
+        "technical_failure"
+      ],
+      "description": "RC16.6: Why a message reached its terminal state."
+    },
+    "scheduled_for": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sent_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "composer_opened_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RC20 Part 16: When the native SMS composer was opened for this message. Opening the composer does NOT mean the message was sent \u2014 status remains pending/approved (user-action-required) until the user explicitly confirms via markMessageSent({status:'sent'}). Only set when the composer is actually opened; null otherwise. Does not affect historical sent_at semantics."
+    },
+    "edited_content": {
+      "type": "string"
+    },
+    "generation_key": {
+      "type": "string",
+      "description": "Provider-independent identity: user_id|campaign_id|recipient_id|scheduled_occurrence"
+    },
+    "version_number": {
+      "type": "number",
+      "default": 1,
+      "description": "1 = original, 2 = alternative/improvement"
+    },
+    "version_type": {
+      "type": "string",
+      "enum": [
+        "original",
+        "alternative",
+        "improvement"
+      ],
+      "default": "original"
+    },
+    "generation_type": {
+      "type": "string",
+      "enum": [
+        "original",
+        "alternative",
+        "improvement",
+        "technical_retry",
+        "validation_retry",
+        "fallback"
+      ],
+      "default": "original"
+    },
+    "is_selected": {
+      "type": "boolean",
+      "default": false,
+      "description": "True when user chose this version to send"
+    },
+    "feedback_id": {
+      "type": "string",
+      "description": "Link to MessageFeedback that triggered this version"
+    },
+    "expired_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this prepared version expired (archived)"
+    },
+    "superseded_by": {
+      "type": "string",
+      "description": "Message ID that replaced this version"
+    },
+    "occurrence": {
+      "type": "string",
+      "description": "ISO timestamp of the scheduled occurrence this message belongs to"
+    },
+    "intent": {
+      "type": "string",
+      "description": "RC13: The communication intent selected by the Relationship Intelligence pipeline. Null for Smart Messages."
+    },
+    "strategy_key": {
+      "type": "string",
+      "description": "RC13: The relationship strategy key resolved by the pipeline. Null for Smart Messages."
+    },
+    "communication_mode": {
+      "type": "string",
+      "enum": [
+        "shared",
+        "personalised"
+      ],
+      "description": "RC13: Whether this message was prepared as shared or personalised."
+    }
+  },
+  "required": [
+    "content",
+    "recipient_name"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

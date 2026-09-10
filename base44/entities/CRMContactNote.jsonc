@@ -1,0 +1,42 @@
+{
+  "name": "CRMContactNote",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "BoriSend user this CRM note belongs to."
+    },
+    "note": {
+      "type": "string"
+    },
+    "created_by_user_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_id",
+    "note"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

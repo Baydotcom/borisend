@@ -1,0 +1,69 @@
+{
+  "name": "GenerationLock",
+  "type": "object",
+  "properties": {
+    "generation_key": {
+      "type": "string",
+      "description": "The GenerationKey this lock protects"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "released",
+        "expired"
+      ],
+      "default": "active"
+    },
+    "locked_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "locked_until": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "request_id": {
+      "type": "string",
+      "description": "Unique request identifier for tracing"
+    },
+    "owner_user_id": {
+      "type": "string",
+      "description": "User who initiated the generation"
+    }
+  },
+  "required": [
+    "generation_key",
+    "request_id",
+    "owner_user_id"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.owner_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

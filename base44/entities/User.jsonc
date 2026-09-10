@@ -1,0 +1,84 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "super_admin",
+        "admin",
+        "user"
+      ],
+      "default": "user"
+    },
+    "default_tone": {
+      "type": "string"
+    },
+    "default_length": {
+      "type": "string"
+    },
+    "default_nickname": {
+      "type": "string"
+    },
+    "signature": {
+      "type": "string"
+    },
+    "timezone": {
+      "type": "string"
+    },
+    "is_disabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "delivery_mode": {
+      "type": "string",
+      "enum": [
+        "auto",
+        "manual"
+      ],
+      "default": "manual"
+    },
+    "automation_token": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string",
+      "enum": [
+        "en",
+        "es",
+        "fr",
+        "pt",
+        "de",
+        "it",
+        "nl",
+        "ar"
+      ],
+      "default": "en"
+    },
+    "message_language": {
+      "type": "string",
+      "enum": [
+        "en",
+        "es",
+        "fr",
+        "pt",
+        "de",
+        "it",
+        "nl",
+        "ar"
+      ],
+      "default": "en"
+    },
+    "deletion_requested": {
+      "type": "boolean",
+      "default": false,
+      "description": "Set to true when the user has requested account deletion"
+    },
+    "deletion_requested_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of when account deletion was requested"
+    }
+  },
+  "required": []
+}

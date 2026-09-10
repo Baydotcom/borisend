@@ -1,0 +1,116 @@
+{
+  "name": "RelationshipMemory",
+  "type": "object",
+  "properties": {
+    "owner_user_id": {
+      "type": "string",
+      "description": "Authenticated owner user ID"
+    },
+    "campaign_id": {
+      "type": "string",
+      "description": "Communication Plan scope. Memory is NOT applied globally across unrelated plans."
+    },
+    "plan_recipient_id": {
+      "type": "string",
+      "description": "Plan Recipient scope \u2014 the primary isolation level for relationship memory."
+    },
+    "memory_type": {
+      "type": "string",
+      "enum": [
+        "fact",
+        "milestone",
+        "important_date",
+        "preference",
+        "boundary",
+        "feedback_derived",
+        "shared_activity",
+        "current_context"
+      ],
+      "description": "Category of memory: contextual fact, milestone, important date, communication preference, boundary, feedback-derived preference, shared activity enjoyed together, or temporary current circumstance."
+    },
+    "content": {
+      "type": "string",
+      "description": "The memory text"
+    },
+    "related_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "is_recurring_annual": {
+      "type": "boolean",
+      "default": false,
+      "description": "RC16.8: True for annually recurring dates (birthday, wedding anniversary, work anniversary). False for one-time dates (appointments, one-off milestones). Annual dates compute their next occurrence deterministically."
+    },
+    "is_trigger_active": {
+      "type": "boolean",
+      "default": false,
+      "description": "RC16.8: True when the user has explicitly activated this date as a communication trigger. Stored dates do NOT automatically generate messages \u2014 the user must opt in (\u00a716)."
+    },
+    "trigger_timing": {
+      "type": "string",
+      "enum": [
+        "on_date",
+        "1_day_before",
+        "3_days_before",
+        "1_week_before",
+        "custom"
+      ],
+      "description": "RC16.8: How far before the date BoriSend should prepare the communication. 'on_date' = on the day itself. Only meaningful when is_trigger_active is true."
+    },
+    "trigger_intent": {
+      "type": "string",
+      "description": "RC16.8: User-defined communication intention for this date trigger (e.g. 'Celebrate our anniversary', 'Wish them happy birthday', 'Encourage them before an important day', 'Remember a milestone', 'Check in after an event'). Informs message generation \u2014 not just a generic date label."
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "owner_user_id",
+    "plan_recipient_id",
+    "memory_type",
+    "content"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.owner_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "data.owner_user_id": "{{user.id}}"
+    },
+    "update": {
+      "$or": [
+        {
+          "data.owner_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.owner_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

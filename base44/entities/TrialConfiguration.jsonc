@@ -1,0 +1,123 @@
+{
+  "name": "TrialConfiguration",
+  "type": "object",
+  "properties": {
+    "trial_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Master switch for the trial system"
+    },
+    "trial_plan_id": {
+      "type": "string",
+      "description": "SubscriptionPlan ID for the trial plan (legacy reference)."
+    },
+    "trial_plan_name": {
+      "type": "string",
+      "description": "Cached plan name for display"
+    },
+    "trial_duration_days": {
+      "type": "number",
+      "default": 7,
+      "description": "Trial duration in calendar days"
+    },
+    "trial_offer_name": {
+      "type": "string",
+      "default": "7-Day BoriSend Trial"
+    },
+    "included_plan_units": {
+      "type": "number",
+      "default": 1,
+      "description": "Communication Plan Units granted during the trial (RC16: 1)."
+    },
+    "included_recipient_units": {
+      "type": "number",
+      "default": 2,
+      "description": "Recipient Units granted during the trial (RC16: 2)."
+    },
+    "included_message_units": {
+      "type": "number",
+      "default": 5,
+      "description": "TOTAL Generated Message Units granted during the entire trial (RC16: 5). These do NOT reset during the 7-day trial."
+    },
+    "included_message_passes": {
+      "type": "number",
+      "default": 2,
+      "description": "RC18: TOTAL Message Passes granted during the entire trial. Conservative default of 2. These do NOT reset during the trial period. Admin-configurable."
+    },
+    "included_smart_messages": {
+      "type": "number",
+      "default": 5,
+      "description": "RC18: TOTAL Smart Message execution units granted during the entire trial. Conservative default of 5. These do NOT reset during the trial period. Admin-configurable."
+    },
+    "default_billing_interval": {
+      "type": "string",
+      "enum": [
+        "monthly",
+        "yearly"
+      ],
+      "default": "monthly"
+    },
+    "auto_conversion_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "If true, subscriptions start automatically at trial end when a payment method is on file"
+    },
+    "payment_reminder_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Show the final-day payment modal"
+    },
+    "reminder_timing_hours": {
+      "type": "number",
+      "default": 24,
+      "description": "Hours before trial end to show the reminder modal"
+    },
+    "one_trial_per_email": {
+      "type": "boolean",
+      "default": true
+    },
+    "one_trial_per_person": {
+      "type": "boolean",
+      "default": true
+    },
+    "allow_admin_extension": {
+      "type": "boolean",
+      "default": true
+    },
+    "max_extension_days": {
+      "type": "number",
+      "default": 7
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "updated_by": {
+      "type": "string",
+      "description": "Admin user ID who last updated this configuration"
+    }
+  },
+  "required": [],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "name": "StripeSyncAudit",
+  "type": "object",
+  "properties": {
+    "plan_id": {
+      "type": "string",
+      "description": "The SubscriptionPlan that was synced"
+    },
+    "plan_name": {
+      "type": "string"
+    },
+    "previous_monthly_price": {
+      "type": "number"
+    },
+    "new_monthly_price": {
+      "type": "number"
+    },
+    "previous_annual_discount": {
+      "type": "number"
+    },
+    "new_annual_discount": {
+      "type": "number"
+    },
+    "previous_stripe_price_id": {
+      "type": "string"
+    },
+    "new_stripe_price_id": {
+      "type": "string"
+    },
+    "admin_user_id": {
+      "type": "string"
+    },
+    "admin_user_email": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "error"
+      ],
+      "default": "success"
+    },
+    "error_message": {
+      "type": "string"
+    },
+    "stripe_environment": {
+      "type": "string",
+      "enum": [
+        "test",
+        "live"
+      ],
+      "default": "test"
+    },
+    "synced_fields": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Which fields triggered the Stripe sync (e.g. price, annual_discount_percentage)"
+    }
+  },
+  "required": [
+    "plan_id"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

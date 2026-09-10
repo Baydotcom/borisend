@@ -1,0 +1,107 @@
+{
+  "name": "ReferralAttribution",
+  "type": "object",
+  "properties": {
+    "referral_code": {
+      "type": "string"
+    },
+    "referrer_user_id": {
+      "type": "string",
+      "description": "The user who referred"
+    },
+    "referred_user_id": {
+      "type": "string",
+      "description": "The user who was referred"
+    },
+    "referred_email": {
+      "type": "string",
+      "description": "Cached email of the referred user for admin visibility"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "attributed",
+        "qualified",
+        "rewarded",
+        "rejected"
+      ],
+      "default": "attributed"
+    },
+    "fraud_flag": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this attribution was flagged for fraud review"
+    },
+    "fraud_reason": {
+      "type": "string",
+      "description": "Reason for fraud flag if any"
+    },
+    "attribution_source": {
+      "type": "string",
+      "description": "How the referral was attributed (link, manual, etc)"
+    }
+  },
+  "required": [
+    "referral_code",
+    "referrer_user_id",
+    "referred_user_id"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    }
+  }
+}

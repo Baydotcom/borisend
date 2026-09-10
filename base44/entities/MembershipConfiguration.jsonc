@@ -1,0 +1,120 @@
+{
+  "name": "MembershipConfiguration",
+  "type": "object",
+  "properties": {
+    "system_key": {
+      "type": "string",
+      "description": "Stable system key for the membership product (e.g. borisend_membership)."
+    },
+    "display_name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "included_plan_units": {
+      "type": "number",
+      "default": 0,
+      "description": "Communication Plan Units included with this membership."
+    },
+    "included_recipient_units": {
+      "type": "number",
+      "default": 0,
+      "description": "Recipient Units included with this membership."
+    },
+    "included_message_units": {
+      "type": "number",
+      "default": 0,
+      "description": "RC18: Generated Message Units included per monthly entitlement period. Unused base messages do not roll over. System key remains message_units for backward compatibility with existing add-on Stripe products."
+    },
+    "included_message_passes": {
+      "type": "number",
+      "default": 5,
+      "description": "RC18: Message Passes included per monthly entitlement period. A Message Pass allows the user to Skip a prepared Generated Message without refunding the Generated Message Unit. Unused passes do not roll over."
+    },
+    "included_smart_message_units": {
+      "type": "number",
+      "default": 30,
+      "description": "RC18: Smart Message execution units included per monthly entitlement period. One successful Smart Message execution to one recipient = one unit. Unused units do not roll over."
+    },
+    "monthly_price": {
+      "type": "number",
+      "description": "Reference monthly price (major units). The Stripe Price ID is the billing source of truth."
+    },
+    "annual_price": {
+      "type": "number",
+      "description": "Reference annual price (major units). The Stripe Price ID is the billing source of truth."
+    },
+    "monthly_stripe_price_id": {
+      "type": "string",
+      "description": "Stripe Price ID for monthly billing. Admin-configurable; left empty until Stripe prices are created."
+    },
+    "annual_stripe_price_id": {
+      "type": "string",
+      "description": "Stripe Price ID for annual billing. Admin-configurable; left empty until Stripe prices are created."
+    },
+    "currency": {
+      "type": "string",
+      "default": "GBP"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "display_order": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "system_key",
+    "display_name",
+    "included_plan_units",
+    "included_recipient_units"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    }
+  }
+}

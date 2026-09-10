@@ -1,0 +1,86 @@
+{
+  "name": "MessagePassUsageLedger",
+  "type": "object",
+  "properties": {
+    "owner_user_id": {
+      "type": "string",
+      "description": "Authoritative owner \u2014 the user who consumed the pass. Set server-side."
+    },
+    "message_id": {
+      "type": "string",
+      "description": "The Message entity that was skipped."
+    },
+    "generation_key": {
+      "type": "string",
+      "description": "RC18 \u00a710: Deterministic identity for idempotency. One Generated Message (generation_key) may consume a MAXIMUM of 1 Message Pass. Repeated Skip clicks, network retries, and frontend retries must not consume additional passes. This key is inherited from the Message's generation_key."
+    },
+    "campaign_id": {
+      "type": "string",
+      "description": "Campaign context for audit."
+    },
+    "plan_recipient_id": {
+      "type": "string",
+      "description": "PlanRecipient context for preference-signal preservation (\u00a714)."
+    },
+    "consumed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the pass was consumed."
+    },
+    "period_start": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Entitlement period start at time of consumption."
+    },
+    "period_end": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Entitlement period end at time of consumption."
+    },
+    "units_consumed": {
+      "type": "number",
+      "default": 1,
+      "description": "Always 1 \u2014 one pass per skip. Stored as a number for ledger consistency."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "consumed",
+        "reversed"
+      ],
+      "default": "consumed",
+      "description": "consumed = pass was used. reversed = admin reversed (audit only, does not refund \u2014 use AdminEntitlementAdjustment to grant compensatory passes)."
+    },
+    "skip_reason": {
+      "type": "string",
+      "description": "Optional user-provided reason for the skip (preference signal, \u00a714)."
+    }
+  },
+  "required": [
+    "owner_user_id",
+    "generation_key",
+    "consumed_at"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,296 @@
+{
+  "name": "Campaign",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "Authoritative owner ID \u2014 the authenticated user. Set server-side by manageCampaign; never trusted from the client."
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "love_messages",
+        "marriage_appreciation",
+        "daily_encouragement",
+        "birthday_reminders",
+        "employee_appreciation",
+        "friday_appreciation",
+        "church_followup",
+        "client_management",
+        "customer_retention",
+        "family_checkins",
+        "prayer_reminders",
+        "motivation",
+        "custom"
+      ],
+      "description": "Legacy prompt-shaping category. Retained for scheduler compatibility. New relationship-driven plans default to 'custom'; the relationship_*_id fields are the BoriSend 2.0 source of truth."
+    },
+    "relationship_category_id": {
+      "type": "string",
+      "description": "RelationshipCategory entity ID (BoriSend 2.0 source of truth for the plan's relationship category)."
+    },
+    "relationship_category_system_key": {
+      "type": "string",
+      "description": "Denormalised RelationshipCategory system_key for portable lookups without a join."
+    },
+    "relationship_type_id": {
+      "type": "string",
+      "description": "RelationshipType entity ID \u2014 the directional/symmetric relationship this plan serves."
+    },
+    "relationship_state_id": {
+      "type": "string",
+      "description": "RelationshipState entity ID \u2014 plan-level default state (e.g. active, neglected)."
+    },
+    "relationship_goal_id": {
+      "type": "string",
+      "description": "RelationshipGoal entity ID \u2014 the objective this plan pursues."
+    },
+    "message_mode": {
+      "type": "string",
+      "enum": [
+        "shared",
+        "personalised"
+      ],
+      "default": "personalised",
+      "description": "shared = one prepared communication reused across recipients where appropriate; personalised = recipient-specific context used to prepare distinct communications."
+    },
+    "message_language": {
+      "type": "string",
+      "description": "RC16.8: Plan-level generated-message language (MessageLanguage system_key, e.g. 'en', 'fr', 'yo'). When set to 'use_default' or empty, inherits the user's default_message_language from BoriSendProfile. Individual PlanRecipients can override this via message_language_override (\u00a78)."
+    },
+    "purpose": {
+      "type": "string"
+    },
+    "tone": {
+      "type": "string",
+      "enum": [
+        "romantic",
+        "loving",
+        "warm",
+        "professional",
+        "friendly",
+        "funny",
+        "respectful",
+        "inspirational",
+        "pastoral",
+        "encouraging",
+        "appreciative",
+        "formal",
+        "casual"
+      ]
+    },
+    "message_length": {
+      "type": "string",
+      "enum": [
+        "short",
+        "medium",
+        "long"
+      ],
+      "default": "medium"
+    },
+    "writing_style": {
+      "type": "string",
+      "enum": [
+        "conversational",
+        "elegant",
+        "simple",
+        "emotional",
+        "inspirational",
+        "business"
+      ],
+      "default": "conversational"
+    },
+    "pet_name": {
+      "type": "string"
+    },
+    "additional_instructions": {
+      "type": "string"
+    },
+    "recipients": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Legacy recipient snapshot retained for scheduler compatibility. The authoritative recipient model is PlanRecipient records, synced from this list by manageCampaign."
+    },
+    "schedule_type": {
+      "type": "string",
+      "enum": [
+        "random_daily",
+        "specific_daily",
+        "twice_daily",
+        "weekly",
+        "every_friday",
+        "monthly",
+        "selected_weekdays",
+        "specific_dates",
+        "custom"
+      ],
+      "default": "specific_daily"
+    },
+    "schedule_time": {
+      "type": "string"
+    },
+    "schedule_days": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
+    "schedule_dates": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "trigger_type": {
+      "type": "string",
+      "enum": [
+        "scheduled",
+        "important_date",
+        "one_time_datetime",
+        "manual_event",
+        "location_arrival",
+        "location_departure"
+      ],
+      "default": "scheduled",
+      "description": "RC16.8: Extensible trigger taxonomy. 'scheduled' = existing recurring schedule behaviour (default). 'important_date' = triggered by an active important-date RelationshipMemory. 'one_time_datetime' = one-off future communication event. 'manual_event' = user-initiated event communication. 'location_arrival'/'location_departure' = native geofence trigger (requires native dependency \u2014 see \u00a729). Extensible: new types can be added without redesigning Campaign."
+    },
+    "trigger_config": {
+      "type": "object",
+      "properties": {
+        "memory_id": {
+          "type": "string",
+          "description": "For important_date: the RelationshipMemory ID that triggers this plan."
+        },
+        "one_time_datetime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "For one_time_datetime: the specific future date/time."
+        },
+        "manual_event_label": {
+          "type": "string",
+          "description": "For manual_event: a user-facing label (e.g. 'I've arrived safely')."
+        },
+        "location_place_name": {
+          "type": "string",
+          "description": "For location triggers: the named place (e.g. 'Work', 'Home'). Not stored as coordinates \u2014 privacy-first (\u00a730)."
+        },
+        "location_latitude": {
+          "type": "number",
+          "description": "For location triggers: geofence centre latitude. Used by native layer only."
+        },
+        "location_longitude": {
+          "type": "number",
+          "description": "For location triggers: geofence centre longitude."
+        },
+        "location_radius_meters": {
+          "type": "number",
+          "description": "For location triggers: geofence radius in metres."
+        },
+        "trigger_cooldown_minutes": {
+          "type": "number",
+          "description": "Minimum minutes between trigger firings for the same occurrence (deduplication/cooldown, \u00a733)."
+        }
+      },
+      "description": "RC16.8: Trigger-specific configuration. Structure depends on trigger_type. Only relevant fields are populated per trigger type."
+    },
+    "approval_mode": {
+      "type": "string",
+      "enum": [
+        "manual",
+        "automatic"
+      ],
+      "default": "manual"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "paused",
+        "completed",
+        "draft",
+        "archived"
+      ],
+      "default": "draft",
+      "description": "RC16.2: 'archived' is the terminal lifecycle state for deleted plans. Archived plans are never eligible for generation, never appear on the dashboard, and their PlanRecipients are deactivated. Historical sent messages are preserved."
+    },
+    "messages_sent": {
+      "type": "number",
+      "default": 0
+    },
+    "next_scheduled": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "contact_group": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "category",
+    "tone"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

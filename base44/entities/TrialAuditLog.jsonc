@@ -1,0 +1,74 @@
+{
+  "name": "TrialAuditLog",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "The user whose trial was affected"
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "trial_started",
+        "trial_extended",
+        "trial_revoked",
+        "conversion_scheduled",
+        "conversion_cancelled",
+        "trial_converted",
+        "trial_expired",
+        "trial_paused",
+        "payment_method_added",
+        "modal_shown",
+        "admin_override",
+        "migration_created_trial"
+      ]
+    },
+    "actor": {
+      "type": "string",
+      "description": "Who performed the action (user ID, 'system', or admin ID)"
+    },
+    "details": {
+      "type": "string",
+      "description": "Human-readable description of the action"
+    },
+    "previous_value": {
+      "type": "string"
+    },
+    "new_value": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_id",
+    "action"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "name": "ReferralProgramConfiguration",
+  "type": "object",
+  "properties": {
+    "key": {
+      "type": "string",
+      "description": "Configuration key (e.g. reward_signup_amount, reward_paid_amount)"
+    },
+    "value": {
+      "type": "string",
+      "description": "Configuration value"
+    },
+    "description": {
+      "type": "string"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "key",
+    "value"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

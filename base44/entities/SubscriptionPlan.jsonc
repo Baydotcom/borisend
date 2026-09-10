@@ -1,0 +1,133 @@
+{
+  "name": "SubscriptionPlan",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string",
+      "description": "Short marketing description shown on plan cards"
+    },
+    "price": {
+      "type": "number",
+      "description": "Monthly price in major currency units (e.g. 3.99). This is the single source of truth for monthly pricing."
+    },
+    "currency": {
+      "type": "string",
+      "default": "GBP"
+    },
+    "billing_period": {
+      "type": "string",
+      "enum": [
+        "monthly",
+        "yearly"
+      ],
+      "default": "monthly",
+      "description": "Default billing period for this plan. Individual subscriptions may use monthly or annual regardless."
+    },
+    "monthly_message_limit": {
+      "type": "number"
+    },
+    "max_campaigns": {
+      "type": "number",
+      "default": 1,
+      "description": "Maximum number of Communication Plans (Campaigns) allowed on this plan."
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Marketing-only features. Never store numeric limits here."
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "sort_order": {
+      "type": "number",
+      "default": 0
+    },
+    "is_popular": {
+      "type": "boolean",
+      "default": false
+    },
+    "promotional_price": {
+      "type": "number"
+    },
+    "promotional_label": {
+      "type": "string"
+    },
+    "stripe_price_id": {
+      "type": "string",
+      "description": "Primary Stripe Price ID (monthly). Kept for backward compatibility with webhook plan-matching logic."
+    },
+    "stripe_product_id": {
+      "type": "string",
+      "description": "Stripe Product ID for this plan"
+    },
+    "stripe_price_id_monthly": {
+      "type": "string",
+      "description": "Stripe Price ID for monthly billing"
+    },
+    "stripe_price_id_annual": {
+      "type": "string",
+      "description": "Stripe Price ID for annual billing. Null for plans that do not support annual billing (e.g. Unlimited)."
+    },
+    "annual_discount_percentage": {
+      "type": "number",
+      "description": "Annual discount percentage (e.g. 16.48 for 16.48%). Admin manages this; the annual price is auto-calculated."
+    },
+    "annual_price": {
+      "type": "number",
+      "description": "Calculated annual price after discount (e.g. 39.99). Auto-calculated from price * 12 * (1 - discount/100)."
+    },
+    "supports_annual": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this plan supports annual billing. Set to false for plans that are monthly-only (e.g. Unlimited)."
+    },
+    "stripe_sync_status": {
+      "type": "string",
+      "enum": [
+        "synced",
+        "pending",
+        "error",
+        "not_synced"
+      ],
+      "default": "not_synced"
+    },
+    "stripe_sync_error": {
+      "type": "string",
+      "description": "Error message from the last failed Stripe sync attempt"
+    },
+    "last_synced_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "name",
+    "price",
+    "monthly_message_limit"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

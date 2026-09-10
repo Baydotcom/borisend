@@ -1,0 +1,118 @@
+{
+  "name": "AdminEntitlementAdjustment",
+  "type": "object",
+  "properties": {
+    "owner_user_id": {
+      "type": "string",
+      "description": "User whose entitlement is adjusted."
+    },
+    "entitlement_type": {
+      "type": "string",
+      "enum": [
+        "communication_plan_units",
+        "recipient_units",
+        "message_units",
+        "message_passes",
+        "smart_message_units"
+      ],
+      "description": "RC18: Extended with message_passes and smart_message_units. message_units = Generated Messages (no duplicate 'generated_messages' type)."
+    },
+    "quantity": {
+      "type": "number",
+      "description": "Capacity delta (positive to grant, negative to reduce)."
+    },
+    "reason": {
+      "type": "string",
+      "description": "Why the adjustment was made (support, promotion, service recovery, testing)."
+    },
+    "created_by_id": {
+      "type": "string",
+      "description": "Admin user who created the adjustment."
+    },
+    "effective_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expiry_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the adjustment expires. Null means permanent (combined with is_permanent)."
+    },
+    "is_permanent": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "owner_user_id",
+    "entitlement_type",
+    "quantity",
+    "reason",
+    "created_by_id"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.owner_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    }
+  }
+}

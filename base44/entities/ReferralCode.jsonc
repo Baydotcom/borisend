@@ -1,0 +1,97 @@
+{
+  "name": "ReferralCode",
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "string",
+      "description": "Unique, stable, shareable referral code (not easily guessable)"
+    },
+    "owner_user_id": {
+      "type": "string",
+      "description": "The user who owns this referral code"
+    },
+    "owner_email": {
+      "type": "string",
+      "description": "Cached email of the owner for admin visibility"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "total_referrals": {
+      "type": "number",
+      "default": 0,
+      "description": "Total number of users who signed up with this code"
+    },
+    "successful_referrals": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of referrals that reached rewarded status"
+    }
+  },
+  "required": [
+    "code",
+    "owner_user_id"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.owner_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "name": "SmartMessageUsageLedger",
+  "type": "object",
+  "properties": {
+    "owner_user_id": {
+      "type": "string",
+      "description": "Authoritative owner \u2014 the user whose Smart Message executed. Set server-side."
+    },
+    "smart_message_id": {
+      "type": "string",
+      "description": "The SmartMessage entity that was executed."
+    },
+    "execution_key": {
+      "type": "string",
+      "description": "RC18 \u00a722: Deterministic idempotency identity: owner_user_id|smart_message_id|recipient_contact_id|trigger_occurrence. One occurrence to one recipient = maximum one chargeable Smart Message execution. Repeated trigger callbacks / network retries must not duplicate the send or commercial usage."
+    },
+    "recipient_contact_id": {
+      "type": "string",
+      "description": "The Contact who received this execution."
+    },
+    "trigger_occurrence": {
+      "type": "string",
+      "description": "ISO timestamp of the trigger occurrence this execution belongs to."
+    },
+    "trigger_type": {
+      "type": "string",
+      "enum": [
+        "time",
+        "date",
+        "recurring_date",
+        "manual_event",
+        "location_arrival",
+        "location_departure"
+      ],
+      "description": "The trigger type that fired this execution."
+    },
+    "consumed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the execution was consumed (charged)."
+    },
+    "period_start": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "period_end": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "units_consumed": {
+      "type": "number",
+      "default": 1,
+      "description": "Always 1 per recipient per occurrence. A multi-recipient execution creates one ledger entry per recipient."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "consumed",
+        "reversed"
+      ],
+      "default": "consumed",
+      "description": "consumed = execution charged. reversed = admin reversed (audit only)."
+    }
+  },
+  "required": [
+    "owner_user_id",
+    "smart_message_id",
+    "execution_key",
+    "consumed_at"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

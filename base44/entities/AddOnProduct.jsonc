@@ -1,0 +1,123 @@
+{
+  "name": "AddOnProduct",
+  "type": "object",
+  "properties": {
+    "system_key": {
+      "type": "string",
+      "description": "Stable system key (e.g. plan_unit_pack_5)."
+    },
+    "display_name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "entitlement_type": {
+      "type": "string",
+      "enum": [
+        "communication_plan_units",
+        "recipient_units",
+        "message_units",
+        "message_passes",
+        "smart_message_units"
+      ],
+      "description": "RC18: Which capacity type this add-on grants. message_units = Generated Messages. message_passes and smart_message_units are new in RC18 but no Stripe products exist for them yet (RC18 \u00a729)."
+    },
+    "quantity": {
+      "type": "number",
+      "description": "Capacity units granted by one unit of this add-on product."
+    },
+    "billing_mode": {
+      "type": "string",
+      "enum": [
+        "one_period",
+        "recurring"
+      ],
+      "default": "one_period",
+      "description": "one_period = active for one entitlement/billing period, no renewal, unused allowance expires at period end. recurring = renews each cycle (cancel-at-period-end). Default is one_period so customers are not defaulted into recurring billing."
+    },
+    "monthly_price": {
+      "type": "number",
+      "description": "Reference one-period / monthly price (major units)."
+    },
+    "annual_price": {
+      "type": "number",
+      "description": "Reference annual price (major units), if supported."
+    },
+    "monthly_stripe_price_id": {
+      "type": "string",
+      "description": "Stripe Price ID for one-period/monthly billing. Admin-configurable; left empty until Stripe prices are created (RC16 \u00a752)."
+    },
+    "annual_stripe_price_id": {
+      "type": "string",
+      "description": "Stripe Price ID for annual billing, if supported. Admin-configurable."
+    },
+    "supports_annual": {
+      "type": "boolean",
+      "default": false
+    },
+    "currency": {
+      "type": "string",
+      "default": "GBP"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "display_order": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "system_key",
+    "display_name",
+    "entitlement_type",
+    "quantity"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    }
+  }
+}

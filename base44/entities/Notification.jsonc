@@ -1,0 +1,121 @@
+{
+  "name": "Notification",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string"
+    },
+    "user_id": {
+      "type": "string",
+      "description": "Authoritative recipient/owner ID (recipient_user_id). The sole key that grants read/update/delete access. Set server-side from the authenticated user or the resolved recipient \u2014 never trusted from the client."
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "message_ready",
+        "awaiting_approval",
+        "message_sent",
+        "failed_send",
+        "ai_generation_failed",
+        "campaign_paused",
+        "campaign_resumed",
+        "campaign_completed",
+        "quota_warning",
+        "subscription_expired",
+        "addon_expiry_reminder",
+        "addon_renewed"
+      ]
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "medium"
+    },
+    "is_read": {
+      "type": "boolean",
+      "default": false
+    },
+    "action_label": {
+      "type": "string"
+    },
+    "action_url": {
+      "type": "string",
+      "description": "Internal app route to open when the notification is tapped (e.g. /subscription?addon=...&mode=renew)."
+    },
+    "deduplication_key": {
+      "type": "string",
+      "description": "RC18.3.3 \u00a73: Deterministic idempotency key for reminder notifications. Format: addon_expiry:{addon_subscription_id}:{days_before_expiry}. Prevents duplicate reminders when the scheduler executes more than once. Checked before creation."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "archived"
+      ],
+      "default": "active"
+    },
+    "campaign_id": {
+      "type": "string"
+    },
+    "message_id": {
+      "type": "string"
+    },
+    "addon_subscription_id": {
+      "type": "string",
+      "description": "RC18.3.3: AddOnSubscription ID this notification refers to (expiry reminders / renewal confirmations)."
+    }
+  },
+  "required": [
+    "title",
+    "body",
+    "type"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "data.user_id": "{{user.id}}"
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

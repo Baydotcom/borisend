@@ -1,0 +1,89 @@
+{
+  "name": "Contact",
+  "type": "object",
+  "properties": {
+    "owner_user_id": {
+      "type": "string",
+      "description": "Authenticated owner user ID. A Contact is the actual human/entity, NOT a Recipient Unit. Set server-side \u2014 never trusted from the client."
+    },
+    "first_name": {
+      "type": "string"
+    },
+    "last_name": {
+      "type": "string"
+    },
+    "display_name": {
+      "type": "string"
+    },
+    "phone_number": {
+      "type": "string",
+      "description": "Display-friendly phone number as entered by the user or imported from device."
+    },
+    "phone_normalized": {
+      "type": "string",
+      "description": "RC18.2: E.164-compatible normalized phone for deduplication. Computed via the canonical phone normalization utility. Primary duplicate-detection signal across imports."
+    },
+    "email": {
+      "type": "string"
+    },
+    "organisation": {
+      "type": "string"
+    },
+    "timezone": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Owner notes / global context about the contact"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "owner_user_id",
+    "display_name"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.owner_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "data.owner_user_id": "{{user.id}}"
+    },
+    "update": {
+      "$or": [
+        {
+          "data.owner_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.owner_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

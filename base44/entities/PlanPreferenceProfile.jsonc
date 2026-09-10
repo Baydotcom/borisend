@@ -1,0 +1,125 @@
+{
+  "name": "PlanPreferenceProfile",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "campaign_id": {
+      "type": "string"
+    },
+    "recipient_id": {
+      "type": "string",
+      "description": "Optional recipient-specific override; null for plan-level"
+    },
+    "tone": {
+      "type": "string"
+    },
+    "length": {
+      "type": "string",
+      "enum": [
+        "short",
+        "medium",
+        "long"
+      ]
+    },
+    "writing_style": {
+      "type": "string"
+    },
+    "humour_level": {
+      "type": "string",
+      "enum": [
+        "none",
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "low"
+    },
+    "emoji_preference": {
+      "type": "string",
+      "enum": [
+        "never",
+        "rarely",
+        "sometimes",
+        "often"
+      ],
+      "default": "never"
+    },
+    "faith_content": {
+      "type": "string",
+      "enum": [
+        "never",
+        "sometimes",
+        "often"
+      ],
+      "default": "sometimes"
+    },
+    "preferred_opening": {
+      "type": "string",
+      "default": "time-neutral"
+    },
+    "avoid_styles": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "feedback_count": {
+      "type": "number",
+      "default": 0
+    },
+    "confidence_score": {
+      "type": "number",
+      "default": 0
+    },
+    "last_feedback_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "user_id",
+    "campaign_id"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

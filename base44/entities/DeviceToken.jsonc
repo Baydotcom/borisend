@@ -1,0 +1,86 @@
+{
+  "name": "DeviceToken",
+  "type": "object",
+  "properties": {
+    "token": {
+      "type": "string",
+      "description": "Push notification device token (FCM token for Android, APNs token for iOS)"
+    },
+    "platform": {
+      "type": "string",
+      "enum": [
+        "android",
+        "ios",
+        "web"
+      ],
+      "description": "Device platform that this token belongs to"
+    },
+    "device_model": {
+      "type": "string",
+      "description": "Device model (e.g. 'Pixel 8', 'iPhone 15')"
+    },
+    "app_version": {
+      "type": "string",
+      "description": "App version when token was registered"
+    },
+    "operating_system": {
+      "type": "string",
+      "description": "Operating system version (e.g. 'Android 14', 'iOS 17.2')"
+    },
+    "last_seen_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last time this device was seen (updated on token refresh and app foreground)"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this token is still valid and should receive notifications"
+    }
+  },
+  "required": [
+    "token",
+    "platform"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

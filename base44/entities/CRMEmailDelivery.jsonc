@@ -1,0 +1,108 @@
+{
+  "name": "CRMEmailDelivery",
+  "type": "object",
+  "properties": {
+    "campaign_id": {
+      "type": "string"
+    },
+    "recipient_user_id": {
+      "type": "string"
+    },
+    "recipient_email": {
+      "type": "string"
+    },
+    "recipient_name": {
+      "type": "string"
+    },
+    "message_provider_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "sent",
+        "delivered",
+        "opened",
+        "clicked",
+        "failed",
+        "bounced",
+        "complained"
+      ],
+      "default": "queued"
+    },
+    "queued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sent_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "delivered_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "first_opened_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "last_opened_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "open_count": {
+      "type": "number",
+      "default": 0
+    },
+    "first_clicked_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "last_clicked_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "click_count": {
+      "type": "number",
+      "default": 0
+    },
+    "bounced_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "complained_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "error_message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "recipient_user_id",
+    "recipient_email"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

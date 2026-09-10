@@ -1,0 +1,50 @@
+{
+  "name": "BoriSendUserIdCounter",
+  "type": "object",
+  "properties": {
+    "month": {
+      "type": "number",
+      "description": "Registration month 1-12"
+    },
+    "year": {
+      "type": "number",
+      "description": "Last two digits of registration year (e.g. 26)"
+    },
+    "last_serial": {
+      "type": "number",
+      "default": 100,
+      "description": "Last assigned serial for this month/year. Starts at 100 so the first ID is 101."
+    },
+    "id_prefix": {
+      "type": "string",
+      "description": "Cached prefix BO/MM/YY for convenience"
+    }
+  },
+  "required": [
+    "month",
+    "year",
+    "last_serial"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

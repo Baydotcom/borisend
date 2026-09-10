@@ -1,0 +1,101 @@
+{
+  "name": "PlanRecipient",
+  "type": "object",
+  "properties": {
+    "owner_user_id": {
+      "type": "string",
+      "description": "Authenticated owner user ID"
+    },
+    "campaign_id": {
+      "type": "string",
+      "description": "Communication Plan / Campaign ID. Connects a Contact to a specific plan."
+    },
+    "contact_id": {
+      "type": "string",
+      "description": "Contact entity ID. The same Contact can appear in multiple PlanRecipient records."
+    },
+    "relationship_type_id": {
+      "type": "string",
+      "description": "RelationshipType entity ID"
+    },
+    "relationship_state_id": {
+      "type": "string",
+      "description": "RelationshipState entity ID"
+    },
+    "relationship_goal_id": {
+      "type": "string",
+      "description": "RelationshipGoal entity ID"
+    },
+    "recipient_context": {
+      "type": "string",
+      "description": "Plan-specific context isolated from the master Contact (e.g. professional context in one plan, developmental in another)."
+    },
+    "message_language_override": {
+      "type": "string",
+      "description": "RC16.8: Per-recipient message language override (MessageLanguage system_key, e.g. 'yo', 'ig', 'fr'). When set, messages for this recipient are generated in this language, overriding the Campaign's message_language and the user's default. Null/empty = inherit the Plan's language (\u00a78). Especially important for multi-recipient plans (pastors/members, managers/teams, family)."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "paused",
+        "deactivated"
+      ],
+      "default": "active"
+    },
+    "joined_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "deactivated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "owner_user_id",
+    "campaign_id",
+    "contact_id"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.owner_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "data.owner_user_id": "{{user.id}}"
+    },
+    "update": {
+      "$or": [
+        {
+          "data.owner_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.owner_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

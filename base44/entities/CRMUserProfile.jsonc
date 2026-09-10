@@ -1,0 +1,62 @@
+{
+  "name": "CRMUserProfile",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "lifecycle_stage": {
+      "type": "string",
+      "enum": [
+        "new",
+        "active",
+        "at_risk",
+        "churned",
+        "vip"
+      ],
+      "default": "new"
+    },
+    "admin_owner_user_id": {
+      "type": "string"
+    },
+    "last_contacted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "next_follow_up_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "user_id"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

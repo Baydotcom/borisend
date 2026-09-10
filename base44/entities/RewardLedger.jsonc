@@ -1,0 +1,139 @@
+{
+  "name": "RewardLedger",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "The user who receives the reward (the referrer)"
+    },
+    "referral_attribution_id": {
+      "type": "string",
+      "description": "Link to the ReferralAttribution record"
+    },
+    "referred_user_id": {
+      "type": "string",
+      "description": "The referred user whose action triggered this reward"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "signup",
+        "trial_started",
+        "became_paid",
+        "remained_active",
+        "subscription_commission"
+      ],
+      "description": "What the referred user did to trigger this reward"
+    },
+    "reward_type": {
+      "type": "string",
+      "enum": [
+        "message_credits",
+        "subscription_days",
+        "cash_payout",
+        "feature_unlock"
+      ],
+      "default": "message_credits"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Reward amount (credits, days, or currency value)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected",
+        "paid"
+      ],
+      "default": "pending"
+    },
+    "source": {
+      "type": "string",
+      "description": "What system or process created this ledger entry"
+    },
+    "subscription_id": {
+      "type": "string",
+      "description": "Stripe subscription ID (commission rewards only)"
+    },
+    "payment_reference": {
+      "type": "string",
+      "description": "Stripe invoice ID used for idempotency (commission rewards only)"
+    },
+    "billing_period": {
+      "type": "string",
+      "enum": [
+        "monthly",
+        "yearly"
+      ],
+      "description": "Billing period of the payment that triggered this commission"
+    },
+    "payment_amount": {
+      "type": "number",
+      "description": "The subscription payment amount that triggered this commission"
+    },
+    "commission_type": {
+      "type": "string",
+      "enum": [
+        "percentage",
+        "fixed_amount"
+      ],
+      "description": "How the commission was calculated (commission rewards only)"
+    },
+    "commission_rate": {
+      "type": "number",
+      "description": "The percentage rate or fixed amount used to calculate this commission"
+    },
+    "commission_cycle_number": {
+      "type": "number",
+      "description": "Which billing cycle this commission reward represents (1-based)"
+    },
+    "commission_duration_rule": {
+      "type": "string",
+      "enum": [
+        "fixed_months",
+        "lifetime"
+      ],
+      "description": "Duration rule in effect when this commission was created"
+    },
+    "audit_metadata": {
+      "type": "object",
+      "description": "Additional audit context (config snapshot, timestamps, etc)"
+    }
+  },
+  "required": [
+    "user_id",
+    "event_type",
+    "amount"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,214 @@
+{
+  "name": "UserSubscription",
+  "type": "object",
+  "properties": {
+    "plan_id": {
+      "type": "string"
+    },
+    "plan_name": {
+      "type": "string"
+    },
+    "owner_user_id": {
+      "type": "string",
+      "description": "The actual app user ID, set explicitly since asServiceRole overrides created_by_id"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "expired",
+        "cancelled",
+        "free",
+        "trial",
+        "paused"
+      ],
+      "default": "trial"
+    },
+    "monthly_limit": {
+      "type": "number",
+      "default": 20
+    },
+    "max_campaigns": {
+      "type": "number",
+      "default": 1,
+      "description": "Cached copy of the plan's max_campaigns at subscription time. The authoritative source is always the SubscriptionPlan entity."
+    },
+    "messages_used_this_month": {
+      "type": "number",
+      "default": 0
+    },
+    "current_period_start": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "current_period_end": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "last_reset_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "stripe_customer_id": {
+      "type": "string"
+    },
+    "stripe_subscription_id": {
+      "type": "string"
+    },
+    "trial_started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the trial began (account activation time)"
+    },
+    "trial_ends_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the trial expires (7 calendar days after trial_started_at)"
+    },
+    "trial_plan_id": {
+      "type": "string",
+      "description": "The SubscriptionPlan ID used during the trial (e.g. Starter)"
+    },
+    "trial_status": {
+      "type": "string",
+      "enum": [
+        "eligible",
+        "active",
+        "payment_method_added",
+        "conversion_scheduled",
+        "converted",
+        "expired",
+        "cancelled",
+        "revoked"
+      ],
+      "default": "eligible"
+    },
+    "trial_offer_name": {
+      "type": "string",
+      "description": "Display name for the trial offer (e.g. 7-Day Starter Trial)"
+    },
+    "trial_billing_interval": {
+      "type": "string",
+      "enum": [
+        "monthly",
+        "yearly"
+      ],
+      "description": "Billing interval the user selected for post-trial conversion"
+    },
+    "trial_payment_method_added_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "trial_conversion_scheduled": {
+      "type": "boolean",
+      "default": false,
+      "description": "True when a Stripe subscription with trial_end has been created"
+    },
+    "trial_converted_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the trial converted to a paid subscription"
+    },
+    "trial_expired_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "trial_extension_count": {
+      "type": "number",
+      "default": 0
+    },
+    "trial_last_reminder_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "trial_modal_last_shown_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Tracks when the final-day payment modal was last shown (once-per-day cap)"
+    },
+    "trial_conversion_cancelled_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the user cancelled the scheduled conversion before trial end"
+    },
+    "is_trial_eligible": {
+      "type": "boolean",
+      "default": true,
+      "description": "False if the user has already used a trial (prevents repeat trials)"
+    },
+    "paused_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the account entered Paused Mode"
+    },
+    "pause_reason": {
+      "type": "string",
+      "description": "Why the account was paused (trial_expired, subscription_cancelled, admin_action)"
+    }
+  },
+  "required": [],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.owner_user_id": "{{user.id}}"
+        },
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "name": "MessageLanguage",
+  "type": "object",
+  "properties": {
+    "system_key": {
+      "type": "string",
+      "description": "Stable language code (e.g. en, yo, fr, ar). Never changes even if display_name changes. Used as the portable identifier throughout the language resolution hierarchy."
+    },
+    "display_name": {
+      "type": "string",
+      "description": "English display name (e.g. English, Yoruba, French). Used in the generation prompt."
+    },
+    "native_name": {
+      "type": "string",
+      "description": "Native language name (e.g. English, Yor\u00f9b\u00e1, Fran\u00e7ais, \u0627\u0644\u0639\u0631\u0628\u064a\u0629). For admin display."
+    },
+    "locale_code": {
+      "type": "string",
+      "description": "ISO 639-1 or ISO 639-3 code for locale resolution (e.g. en, yo, ig, ha, fr, es, pt, de, it, nl, ar, sw, hi, ur, bn, pa, zh, ja, ko, tr, id)."
+    },
+    "generation_instruction": {
+      "type": "string",
+      "description": "Optional additional generation instruction for this language (e.g. 'Write in Modern Standard Arabic. Use RTL script.' or 'Use informal T-V distinction naturally.')."
+    },
+    "display_order": {
+      "type": "number",
+      "default": 0
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Active languages appear in user selection. Inactive languages are hidden from new selection but preserved for existing configuration (RC16.8 \u00a748)."
+    }
+  },
+  "required": [
+    "system_key",
+    "display_name"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    }
+  }
+}

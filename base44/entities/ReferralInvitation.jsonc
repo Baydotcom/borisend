@@ -1,0 +1,75 @@
+{
+  "name": "ReferralInvitation",
+  "type": "object",
+  "properties": {
+    "referral_code": {
+      "type": "string"
+    },
+    "referrer_user_id": {
+      "type": "string"
+    },
+    "invited_email": {
+      "type": "string"
+    },
+    "invited_user_id": {
+      "type": "string",
+      "description": "Set when the invited user actually registers"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "sent",
+        "opened",
+        "registered",
+        "expired"
+      ],
+      "default": "sent"
+    },
+    "sent_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "registered_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "referral_code",
+    "referrer_user_id"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.referrer_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "data.referrer_user_id": "{{user.id}}"
+    },
+    "update": {
+      "$or": [
+        {
+          "data.referrer_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

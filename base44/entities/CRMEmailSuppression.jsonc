@@ -1,0 +1,51 @@
+{
+  "name": "CRMEmailSuppression",
+  "type": "object",
+  "properties": {
+    "email": {
+      "type": "string"
+    },
+    "user_id": {
+      "type": "string"
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "unsubscribed",
+        "bounced",
+        "complaint",
+        "admin"
+      ],
+      "default": "unsubscribed"
+    },
+    "source": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "email",
+    "reason"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

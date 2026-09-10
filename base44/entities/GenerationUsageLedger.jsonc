@@ -1,0 +1,147 @@
+{
+  "name": "GenerationUsageLedger",
+  "type": "object",
+  "properties": {
+    "request_id": {
+      "type": "string"
+    },
+    "generation_key": {
+      "type": "string"
+    },
+    "user_id": {
+      "type": "string"
+    },
+    "campaign_id": {
+      "type": "string"
+    },
+    "recipient_id": {
+      "type": "string"
+    },
+    "scheduled_occurrence": {
+      "type": "string"
+    },
+    "message_id": {
+      "type": "string"
+    },
+    "version_number": {
+      "type": "number"
+    },
+    "generation_type": {
+      "type": "string",
+      "enum": [
+        "original",
+        "alternative",
+        "improvement",
+        "technical_retry",
+        "validation_retry"
+      ],
+      "default": "original"
+    },
+    "provider_internal_name": {
+      "type": "string",
+      "description": "Internal only \u2014 never shown to users"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "duration_ms": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "failed",
+        "retrying"
+      ],
+      "default": "success"
+    },
+    "failure_category": {
+      "type": "string"
+    },
+    "validation_result": {
+      "type": "string"
+    },
+    "provider_units": {
+      "type": "number",
+      "description": "Estimated provider units consumed"
+    },
+    "estimated_cost": {
+      "type": "number",
+      "description": "Estimated cost in minor currency units"
+    },
+    "feedback_reason": {
+      "type": "string",
+      "description": "User feedback reason if alternative/improvement"
+    }
+  },
+  "required": [
+    "request_id",
+    "generation_key",
+    "user_id",
+    "generation_type"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    }
+  }
+}

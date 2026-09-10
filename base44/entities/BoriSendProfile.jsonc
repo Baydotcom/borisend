@@ -1,0 +1,89 @@
+{
+  "name": "BoriSendProfile",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "Authenticated Base44 user ID \u2014 the immutable relational key (NOT the public ID)."
+    },
+    "borisend_user_id": {
+      "type": "string",
+      "description": "Public-facing BoriSend reference identifier in BO/MM/YY/SN format. Immutable once assigned."
+    },
+    "first_name": {
+      "type": "string"
+    },
+    "last_name": {
+      "type": "string"
+    },
+    "timezone": {
+      "type": "string"
+    },
+    "preferred_locale": {
+      "type": "string",
+      "description": "Preferred APPLICATION/INTERFACE language/locale code (e.g. en, fr). This is the UI language, NOT the generated-message language."
+    },
+    "default_message_language": {
+      "type": "string",
+      "description": "RC16.8: Authoritative default GENERATED-MESSAGE language (MessageLanguage system_key, e.g. 'en', 'yo', 'fr'). This is the language BoriSend uses for message generation, completely separate from the application/interface language. Falls back to 'en' (English) if unset. Resolved via the language hierarchy: PlanRecipient override \u2192 Campaign message_language \u2192 this field \u2192 English fallback."
+    },
+    "onboarding_status": {
+      "type": "string",
+      "enum": [
+        "incomplete",
+        "complete"
+      ],
+      "default": "incomplete",
+      "description": "Whether the user has completed BoriSend 2.0 onboarding. Existing users provisioned in RC10 start incomplete."
+    },
+    "profile_status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "suspended",
+        "deactivated"
+      ],
+      "default": "active"
+    }
+  },
+  "required": [
+    "user_id",
+    "borisend_user_id"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

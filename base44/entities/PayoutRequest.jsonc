@@ -1,0 +1,126 @@
+{
+  "name": "PayoutRequest",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Cached email for admin visibility"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Payout amount"
+    },
+    "currency": {
+      "type": "string",
+      "default": "GBP"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "requested",
+        "approved",
+        "rejected",
+        "paid"
+      ],
+      "default": "requested"
+    },
+    "method": {
+      "type": "string",
+      "description": "Settlement method. Current launch workflow uses manual_bank_transfer; no bank details are stored in BoriSend."
+    },
+    "payment_reference": {
+      "type": "string",
+      "description": "External payment/bank transfer reference recorded by admin when settlement is completed."
+    },
+    "processed_by_user_id": {
+      "type": "string",
+      "description": "Admin or super-admin user ID that last processed this payout."
+    },
+    "reward_ledger_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Reward ledger entries being paid out"
+    },
+    "requested_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "processed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "admin_notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "user_id",
+    "amount"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    }
+  }
+}

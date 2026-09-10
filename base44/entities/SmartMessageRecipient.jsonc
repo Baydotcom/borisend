@@ -1,0 +1,78 @@
+{
+  "name": "SmartMessageRecipient",
+  "type": "object",
+  "properties": {
+    "owner_user_id": {
+      "type": "string",
+      "description": "Authoritative owner \u2014 the user who owns this Smart Message recipient linkage. Set server-side."
+    },
+    "smart_message_id": {
+      "type": "string",
+      "description": "SmartMessage entity ID. Connects a Contact to a specific Smart Message."
+    },
+    "contact_id": {
+      "type": "string",
+      "description": "Contact entity ID. The same Contact can appear in multiple SmartMessageRecipient records and in PlanRecipient records independently. Contact does NOT need to belong to a Communication Plan (\u00a75)."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "paused"
+      ],
+      "default": "active",
+      "description": "active = receives Smart Message executions. paused = temporarily excluded from execution."
+    },
+    "joined_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this recipient was added to the Smart Message."
+    }
+  },
+  "required": [
+    "owner_user_id",
+    "smart_message_id",
+    "contact_id"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.owner_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "data.owner_user_id": "{{user.id}}"
+    },
+    "update": {
+      "$or": [
+        {
+          "data.owner_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "data.owner_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    }
+  }
+}

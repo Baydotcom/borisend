@@ -1,0 +1,82 @@
+{
+  "name": "PromotionalEntitlement",
+  "type": "object",
+  "properties": {
+    "owner_user_id": {
+      "type": "string"
+    },
+    "entitlement_type": {
+      "type": "string",
+      "enum": [
+        "communication_plan_units",
+        "recipient_units",
+        "message_units",
+        "message_passes",
+        "smart_message_units"
+      ],
+      "description": "RC18: Extended with message_passes and smart_message_units. No promotional behaviour is wired for the new types yet \u2014 RC18 \u00a731 reports the extension required."
+    },
+    "quantity": {
+      "type": "number"
+    },
+    "promotion_key": {
+      "type": "string",
+      "description": "Stable identifier for the promotion campaign."
+    },
+    "display_name": {
+      "type": "string"
+    },
+    "effective_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expiry_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the promotional capacity expires. Null/absent means no expiry (future-ready, not a default offer)."
+    },
+    "source": {
+      "type": "string",
+      "description": "Origin of the promotion (campaign, partner, admin)."
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "owner_user_id",
+    "entitlement_type",
+    "quantity",
+    "promotion_key"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.owner_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

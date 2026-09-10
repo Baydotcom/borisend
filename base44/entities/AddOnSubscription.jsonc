@@ -1,0 +1,128 @@
+{
+  "name": "AddOnSubscription",
+  "type": "object",
+  "properties": {
+    "owner_user_id": {
+      "type": "string",
+      "description": "Authoritative owner user ID \u2014 set server-side, never trusted from the client."
+    },
+    "add_on_product_id": {
+      "type": "string",
+      "description": "AddOnProduct entity ID defining the add-on and its capacity grant."
+    },
+    "entitlement_type": {
+      "type": "string",
+      "enum": [
+        "communication_plan_units",
+        "recipient_units",
+        "message_units",
+        "message_passes",
+        "smart_message_units"
+      ],
+      "description": "RC18: Extended with message_passes and smart_message_units."
+    },
+    "quantity": {
+      "type": "number",
+      "description": "Capacity units granted by this add-on subscription."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "cancel_at_period_end",
+        "expired",
+        "cancelled",
+        "past_due",
+        "scheduled"
+      ],
+      "default": "active",
+      "description": "RC18.3.3: 'scheduled' = next-period renewal purchased but not yet effective. EntitlementService lazily promotes scheduled add-ons to 'active' once effective_from passes. active = contributes capacity now. expired/cancelled = no contribution."
+    },
+    "purchase_mode": {
+      "type": "string",
+      "enum": [
+        "current",
+        "next_period"
+      ],
+      "default": "current",
+      "description": "RC18.3.3 \u00a76/\u00a77: 'current' = Buy More Now (immediate current-period capacity). 'next_period' = Renew for Next Period (capacity scheduled to begin at the next monthly entitlement boundary)."
+    },
+    "effective_from": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RC18.3.3 \u00a77: For next_period renewals, the timestamp from which this add-on begins contributing capacity (the next monthly entitlement boundary). Null for current-period purchases (effective immediately). EntitlementService includes scheduled add-ons only when now >= effective_from."
+    },
+    "renewal_intent_key": {
+      "type": "string",
+      "description": "RC18.3.4: Deterministic renewal identity for webhook-level payment idempotency. Format: addon_renewal:{owner_user_id}:{add_on_product_id}:{target_period_start}. Computed server-side in createAddonCheckoutSession and verified in stripeWebhook before granting entitlement. Prevents duplicate scheduled renewals when two concurrent/abandoned Checkout Sessions are both paid. Null for current-period (Buy More Now) purchases, which are intentionally stackable."
+    },
+    "auto_renew": {
+      "type": "boolean",
+      "default": false,
+      "description": "RC16.7: Default OFF \u2014 one-period add-ons do not renew. Only true for recurring billing_mode add-ons."
+    },
+    "stripe_customer_id": {
+      "type": "string"
+    },
+    "stripe_subscription_id": {
+      "type": "string",
+      "description": "Stripe Subscription ID (recurring add-ons only). Null for one-time (one_period) purchases."
+    },
+    "stripe_checkout_session_id": {
+      "type": "string",
+      "description": "RC16.7: Stripe Checkout Session ID \u2014 idempotency key for one-time (one_period) add-on purchases. Null for recurring add-ons."
+    },
+    "current_period_start": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "current_period_end": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this add-on's capacity expires. For one_period add-ons, aligned to the user's membership monthly entitlement window end (RC18.3.2). For scheduled renewals, this is the end of the NEXT monthly window."
+    },
+    "cancel_at_period_end": {
+      "type": "boolean",
+      "default": false
+    },
+    "cancelled_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "owner_user_id",
+    "add_on_product_id",
+    "entitlement_type",
+    "quantity"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "data.owner_user_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
