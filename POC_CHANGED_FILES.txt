@@ -1,0 +1,12 @@
+POC v3 changed/added files
+- capacitor.config.ts
+- src/capacitor.config.ts
+- scripts/prepare-android-geofence-poc.mjs
+- scripts/configure-android-release-signing.mjs
+- native-poc/android/MainActivity.java.tmpl
+- native-poc/android/GeofencePlugin.java.tmpl
+- native-poc/android/GeofenceBroadcastReceiver.java.tmpl
+- native-poc/android/GeofenceEventStore.java.tmpl
+- .github/workflows/android-geofence-poc.yml
+- README.md
+- POC_V3_NOTES.md
