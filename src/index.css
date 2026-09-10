@@ -1,0 +1,272 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@layer base {
+  :root {
+    /* BoriSend 2.0 — Magenta brand identity, flat surfaces, no gradients */
+    --background: 40 30% 97%;
+    --foreground: 320 15% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 320 15% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 320 15% 12%;
+    --primary: 325 78% 48%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 40 20% 93%;
+    --secondary-foreground: 320 12% 25%;
+    --muted: 40 18% 94%;
+    --muted-foreground: 320 8% 42%;
+    --accent: 40 10% 93%;
+    --accent-foreground: 320 12% 25%;
+    --destructive: 0 65% 48%;
+    --destructive-foreground: 0 0% 98%;
+    --success: 150 45% 38%;
+    --success-foreground: 0 0% 100%;
+    --warning: 35 75% 48%;
+    --warning-foreground: 0 0% 100%;
+    --info: 200 55% 42%;
+    --info-foreground: 0 0% 100%;
+    --border: 40 14% 88%;
+    --input: 40 14% 88%;
+    --ring: 325 78% 48%;
+    --chart-1: 325 78% 48%;
+    --chart-2: 200 55% 45%;
+    --chart-3: 150 45% 40%;
+    --chart-4: 35 70% 50%;
+    --chart-5: 280 40% 55%;
+    --radius: 0.75rem;
+    --font-heading: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    --font-body: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    --font-display: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    --sidebar-background: 40 30% 97%;
+    --sidebar-foreground: 320 8% 30%;
+    --sidebar-primary: 325 78% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 40 20% 93%;
+    --sidebar-accent-foreground: 320 12% 25%;
+    --sidebar-border: 40 14% 88%;
+    --sidebar-ring: 325 78% 48%;
+  }
+}
+
+@layer base {
+  .dark {
+    --background: 320 10% 10%;
+    --foreground: 40 15% 92%;
+    --card: 320 8% 14%;
+    --card-foreground: 40 15% 92%;
+    --popover: 320 8% 16%;
+    --popover-foreground: 40 15% 92%;
+    --primary: 325 70% 62%;
+    --primary-foreground: 320 10% 10%;
+    --secondary: 320 8% 19%;
+    --secondary-foreground: 40 12% 88%;
+    --muted: 320 8% 16%;
+    --muted-foreground: 40 8% 62%;
+    --accent: 320 10% 20%;
+    --accent-foreground: 40 12% 88%;
+    --destructive: 0 55% 52%;
+    --destructive-foreground: 0 0% 98%;
+    --success: 150 40% 48%;
+    --success-foreground: 0 0% 100%;
+    --warning: 35 65% 55%;
+    --warning-foreground: 320 10% 10%;
+    --info: 200 50% 55%;
+    --info-foreground: 0 0% 100%;
+    --border: 320 8% 22%;
+    --input: 320 8% 22%;
+    --ring: 325 70% 62%;
+    --chart-1: 325 70% 62%;
+    --chart-2: 200 50% 55%;
+    --chart-3: 150 40% 52%;
+    --chart-4: 35 60% 58%;
+    --chart-5: 280 40% 62%;
+    --sidebar-background: 320 10% 10%;
+    --sidebar-foreground: 40 8% 62%;
+    --sidebar-primary: 325 70% 62%;
+    --sidebar-primary-foreground: 320 10% 10%;
+    --sidebar-accent: 320 8% 19%;
+    --sidebar-accent-foreground: 40 12% 88%;
+    --sidebar-border: 320 8% 22%;
+    --sidebar-ring: 325 70% 62%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+    font-family: var(--font-body);
+  }
+  h1, h2, h3, h4, h5, h6,
+  button, input, textarea, select, option {
+    font-family: var(--font-body);
+  }
+  /* RC20 Part 26: prevent iOS auto text-inflation on orientation/width; OS
+     accessibility (Dynamic Type / Android font scale) remains respected and
+     is verified on real devices. */
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+}
+
+/* RC16.4: Global Text Size accessibility — scales body/heading font sizes
+   via CSS custom properties. Applied via data-text-size attribute on <html>.
+   Standard = 1.0x, Small = 0.92x, Large = 1.12x.
+   Icons, logos, and fixed layout dimensions are NOT affected. */
+:root {
+  --text-size-scale: 1;
+}
+[data-text-size="small"] {
+  --text-size-scale: 0.92;
+}
+[data-text-size="standard"] {
+  --text-size-scale: 1;
+}
+[data-text-size="large"] {
+  --text-size-scale: 1.12;
+}
+
+/* Apply the scale to text-bearing elements only */
+[data-text-size] body,
+[data-text-size] .text-xs,
+[data-text-size] .text-sm,
+[data-text-size] .text-base,
+[data-text-size] .text-lg,
+[data-text-size] .text-xl,
+[data-text-size] .text-2xl,
+[data-text-size] .text-3xl,
+[data-text-size] p,
+[data-text-size] span,
+[data-text-size] label,
+[data-text-size] h1,
+[data-text-size] h2,
+[data-text-size] h3,
+[data-text-size] h4,
+[data-text-size] h5,
+[data-text-size] h6,
+[data-text-size] a,
+[data-text-size] button,
+[data-text-size] input,
+[data-text-size] textarea,
+[data-text-size] select,
+[data-text-size] td,
+[data-text-size] th,
+[data-text-size] li {
+  font-size: calc(1em * var(--text-size-scale));
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 999px;
+}
+
+/* Hide scrollbar for horizontal scroll containers */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Safe area insets for mobile devices */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+/* RC16.3: Shared mobile safe-area — clears fixed bottom nav (64px) + breathing room */
+.nav-safe-bottom {
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+}
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+.safe-area-inset {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Overscroll behavior — prevent iOS bounce and white gaps */
+html, body {
+  overscroll-behavior-y: none;
+  -webkit-overflow-scrolling: touch;
+  overflow-anchor: none;
+}
+
+/* Horizontal scroll containers keep their own scroll containment */
+.scrollbar-hide {
+  overscroll-behavior-x: contain;
+}
+
+/* Disable text selection on interactive elements (store compliance) */
+button,
+a,
+[role="button"],
+nav,
+.no-select {
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Allow text selection on content users may need to copy */
+input, textarea, .selectable {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Smooth page transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.3s ease-out;
+}
+
+/* BoriSend startup / loading screen — solid BoriSend Magenta + rotating White logo.
+   Fixed Magenta (design-system primary light value, hsl(325 78% 48%) = #DA1B8A) so
+   the branded startup is identical in Light and Dark Mode (no first-paint shift). */
+.borisend-startup-bg {
+  background-color: hsl(325 78% 48%);
+}
+@keyframes borisend-startup-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.borisend-startup-logo {
+  animation: borisend-startup-rotate 1.8s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .borisend-startup-logo { animation: none; }
+}
+
+/* BoriSend in-app loaders (PageLoader / InlineLoader) — approved Magenta logo
+   with a smooth, restrained rotation. Distinct from the startup screen. */
+@keyframes borisend-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.borisend-logo-spin {
+  animation: borisend-logo-spin 2s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .borisend-logo-spin { animation: none; }
+}
